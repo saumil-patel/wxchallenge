@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.645
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Woolworths.Assessment", "Woolworths.Assessment\Woolworths.Assessment.csproj", "{F145AD8F-6D7D-4749-9E8A-015D52793170}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Woolworths.Assessment.TestProject", "Woolworths.Assessment.TestProject\Woolworths.Assessment.TestProject.csproj", "{20B2ED0D-90DD-4800-B2A6-4AFCF1FC3B72}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F145AD8F-6D7D-4749-9E8A-015D52793170}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F145AD8F-6D7D-4749-9E8A-015D52793170}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F145AD8F-6D7D-4749-9E8A-015D52793170}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F145AD8F-6D7D-4749-9E8A-015D52793170}.Release|Any CPU.Build.0 = Release|Any CPU
+		{20B2ED0D-90DD-4800-B2A6-4AFCF1FC3B72}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20B2ED0D-90DD-4800-B2A6-4AFCF1FC3B72}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{20B2ED0D-90DD-4800-B2A6-4AFCF1FC3B72}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{20B2ED0D-90DD-4800-B2A6-4AFCF1FC3B72}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EA28709C-0EFC-4E92-8A8C-F8591B8C7065}
+	EndGlobalSection
+EndGlobal
