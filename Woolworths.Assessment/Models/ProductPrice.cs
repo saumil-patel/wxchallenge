@@ -8,6 +8,6 @@ namespace Woolworths.Assessment.Models
         public string Name { get; set; }
 
         [JsonProperty("price")]
-        public double Price { get; set; }
+        public decimal Price { get; set; }
     }
 }

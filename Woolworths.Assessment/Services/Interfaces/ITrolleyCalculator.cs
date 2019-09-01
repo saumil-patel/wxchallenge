@@ -4,6 +4,6 @@ namespace Woolworths.Assessment.Services.Interfaces
 {
     public interface ITrolleyCalculator
     {
-        double CalculateTrolleyTotal(TrolleyTotalRequest trolleyTotalRequest);
+        decimal CalculateTrolleyTotal(TrolleyTotalRequest trolleyTotalRequest);
     }
 }
