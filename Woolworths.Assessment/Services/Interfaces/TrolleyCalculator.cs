@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using Woolworths.Assessment.Models;
 
@@ -6,51 +7,68 @@ namespace Woolworths.Assessment.Services.Interfaces
 {
     public class TrolleyCalculator : ITrolleyCalculator
     {
-        private class SpecialWithActuals
-        {
-            public Special Special { get; set; }
-            public decimal DiscountedRate { get; set; }
-
-            public decimal ActualTotal { get; set; }
-
-        }
-
-
         public decimal CalculateTrolleyTotal(TrolleyTotalRequest trolleyTotalRequest)
         {
-            //TODO: this algorithm (sorting offers by best value for money and using in that order to make use of max quantity) isn't working for all scenario
-            //look at knapsack or salesman problems
+            var priceLookup = GetProductPriceLookup(trolleyTotalRequest);
+
+            var quantitiesLookup = GetOrderedQuantitiesInLookupFormat(trolleyTotalRequest).ToImmutableDictionary();
+
+            return GetLowestTotal(priceLookup, trolleyTotalRequest.Specials.ToImmutableList(), quantitiesLookup, 0);
+        }
+
+        private decimal GetLowestTotal(Dictionary<string, ProductPrice> priceLookup, ImmutableList<Special> sortedSpecials, ImmutableDictionary<string, int> quantitiesLookup, decimal currentTotal)
+        {
+            var lowestCost = new SortedSet<decimal>();
+            foreach (var specialOffer in sortedSpecials)
+            {
+
+                if (SpecialOfferCanBeApplied(specialOffer, quantitiesLookup))
+                {
+
+                    var remainingQuantity = GetQuantityAfterOffer(specialOffer, quantitiesLookup);
+                    var offerTotal = currentTotal + specialOffer.Total;
+
+                    var remainingLowest = GetLowestTotal(priceLookup, sortedSpecials, remainingQuantity, offerTotal);
+                    lowestCost.Add(remainingLowest);
+                }
+            }
+
+            lowestCost.Add(currentTotal + GetNoOfferRemainingTotal(quantitiesLookup, priceLookup));
+            return lowestCost.Min;
+        }
+
+        private ImmutableDictionary<string, int> GetQuantityAfterOffer(Special specialOffer, ImmutableDictionary<string, int> quantitiesLookup)
+        {
+            var newQuantitiesLookup = new Dictionary<string, int>();
+            foreach (var specialQuantity in specialOffer.Quantities)
+            {
+                newQuantitiesLookup.Add(specialQuantity.Name, quantitiesLookup[specialQuantity.Name] - specialQuantity.Number);
+            }
+
+            return newQuantitiesLookup.ToImmutableDictionary();
+        }
+
+        private decimal GetNoOfferRemainingTotal(ImmutableDictionary<string, int> quantitiesLookup, Dictionary<string, ProductPrice> priceLookup)
+        {
+            decimal remainingTotal = 0;
+
+            foreach (var pair in quantitiesLookup)
+            {
+                remainingTotal += pair.Value * priceLookup[pair.Key].Price;
+            }
+
+            return remainingTotal;
+        }
+
+        private static Dictionary<string, ProductPrice> GetProductPriceLookup(TrolleyTotalRequest trolleyTotalRequest)
+        {
             var priceLookup = new Dictionary<string, ProductPrice>();
             foreach (var product in trolleyTotalRequest.Products)
             {
                 priceLookup.Add(product.Name, product);
             }
 
-            var sortedSpecialActual = GetSpecialsSortedByBestValueForMoney(trolleyTotalRequest, priceLookup);
-
-            var quantitiesLookup = GetOrderedQuantitiesInLookupFormat(trolleyTotalRequest);
-
-            decimal minimumToPay = 0;
-
-            foreach (var specialOffer in sortedSpecialActual)
-            {
-                
-                while (SpecialOfferCanBeUsed(specialOffer, quantitiesLookup))
-                {
-                    minimumToPay += specialOffer.Special.Total;
-                    foreach (var specialQuantity in specialOffer.Special.Quantities)
-                    {
-                        quantitiesLookup[specialQuantity.Name] -= specialQuantity.Number;
-                    }
-                }
-            }
-
-            foreach (var pair in quantitiesLookup)
-            {
-                minimumToPay += priceLookup[pair.Key].Price * pair.Value;
-            }
-
-            return minimumToPay;
+            return priceLookup;
         }
 
         private static Dictionary<string, int> GetOrderedQuantitiesInLookupFormat(TrolleyTotalRequest trolleyTotalRequest)
@@ -71,41 +89,10 @@ namespace Woolworths.Assessment.Services.Interfaces
             return quantitiesLookup;
         }
 
-        private static IOrderedEnumerable<SpecialWithActuals> GetSpecialsSortedByBestValueForMoney(TrolleyTotalRequest trolleyTotalRequest,
-            Dictionary<string, ProductPrice> priceLookup)
+
+        private static bool SpecialOfferCanBeApplied(Special special, ImmutableDictionary<string, int> quantitiesLookup)
         {
-            var specialActual = new List<SpecialWithActuals>();
-
-
-            foreach (var special in trolleyTotalRequest.Specials)
-            {
-                decimal actualPrice = 0;
-
-                foreach (var specialQuantity in special.Quantities)
-                {
-                    actualPrice += priceLookup[specialQuantity.Name].Price * specialQuantity.Number;
-                }
-
-
-                var discountedRate = special.Total / actualPrice;
-                if (discountedRate < 1)
-                {
-                    specialActual.Add(new SpecialWithActuals
-                    {
-                        Special = special,
-                        ActualTotal = actualPrice,
-                        DiscountedRate = discountedRate
-                    });
-                }
-            }
-
-            var sortedSpecialActual = specialActual.OrderBy(s => s.DiscountedRate);
-            return sortedSpecialActual;
-        }
-
-        private static bool SpecialOfferCanBeUsed(SpecialWithActuals actuals, Dictionary<string, int> quantitiesLookup)
-        {
-            return actuals.Special.Quantities.ToList().TrueForAll(p =>
+            return special.Quantities.ToList().TrueForAll(p =>
                 quantitiesLookup.ContainsKey(p.Name) && quantitiesLookup[p.Name] >= p.Number);
         }
     }

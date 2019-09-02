@@ -31,6 +31,7 @@ namespace Woolworths.Assessment
             services.AddTransient<IProductSortingStrategy, AscendingSortingStrategy>();
             services.AddTransient<IProductSortingStrategy, DescendingSortingStrategy>();
             services.AddTransient<IProductSortingStrategy, RecommendedSortingStrategy>();
+            services.AddTransient<ITrolleyCalculator, TrolleyCalculator>();
 
             services.AddScoped<IProductSorter, ProductSorter>();
 

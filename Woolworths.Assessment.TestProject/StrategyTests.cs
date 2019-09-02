@@ -39,7 +39,7 @@ namespace Woolworths.Assessment.TestProject
 
             Assert.AreEqual(SortOption.Recommended, sortingStrategy.GetSortType);
 
-            List<Product> testUnsortedProducts = new List<Product>
+            var testUnsortedProducts = new List<Product>
             {
                 new Product { Name = product1 },
                 new Product { Name = product2 },

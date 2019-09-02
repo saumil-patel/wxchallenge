@@ -61,7 +61,7 @@ namespace Woolworths.Assessment.Controllers
                 return BadRequest("Please provide valid trolley total request.");
             }
 
-            double trolleyTotal = await _woolworthsResourceProvider.CalculateTrolleyTotal(trolleyTotalRequest);
+            var trolleyTotal = await _woolworthsResourceProvider.CalculateTrolleyTotal(trolleyTotalRequest);
 
             return Ok(trolleyTotal);
         }
